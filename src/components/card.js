@@ -1,57 +1,42 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Card, Col, Row } from "antd";
 import { MailOutlined, MessageOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function CardBir() {
-  let kullaniciAdi = useRef();
-  const [selectedFile, setSelectedFile] = useState([]);
+  const [files, setFiles] = useState([]);
 
-  const onFileChange = (event) => {
-    setSelectedFile({ selectedFile: event.target.files[0] });
+  const onFileChange = (e) => {
+    setFiles(e.target.files);
   };
-  const onFileUpload = () => {
-    // Create an object of formData
-    const formData = new FormData();
-    // Update the formData object
-    formData.append(
-      "myFile",
-      this.state.selectedFile,
-      this.state.selectedFile.name
-    );
-    // Details of the uploaded file
-    console.log(selectedFile);
-    axios.post("api/uploadfile", formData);
-  };
-  const fileData = () => {
-    if (setSelectedFile) {
-      return (
-        <div>
-          <h2>File Details:</h2>
+  const onFileUpload = (e) => {
+    e.preventDefault();
 
-          <p>File Name: {this.state.selectedFile.name}</p>
+    const data = new FormData();
 
-          <p>File Type: {this.state.selectedFile.type}</p>
-
-          <p>
-            Last Modified: {setSelectedFile.lastModifiedDate.toDateString()}
-          </p>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <br />
-          <h4>Choose before Pressing the Upload button</h4>
-        </div>
-      );
+    for (let i = 0; i < files.length; i++) {
+      data.append("file", files[i]);
     }
+    axios
+      .post("//localhost:8000/upload", data)
+      .then((e) => {
+        toast.success("Upload Success");
+      })
+      .catch((e) => {
+        toast.error("Upload Error");
+      });
   };
 
   return (
     <div className="card">
-      <input type="file" onChange={onFileChange} className="hidden-input" />
-      <button>Upload</button>
+      <input
+        type="file"
+        onChange={onFileChange}
+        className="hidden-input"
+        multiple
+      />
+      <button onClick={onFileUpload}>Upload</button>
 
       <br />
       <br />
